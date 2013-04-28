@@ -17,7 +17,24 @@ package org.atmosphere.samples.client;
 
 import org.atmosphere.gwt.client.AtmosphereGWTSerializer;
 import org.atmosphere.gwt.client.SerialTypes;
+import org.atmosphere.gwt.shared.SerialMode;
 
-@SerialTypes(value = {Event.class})
+@SerialTypes(value = { Event.class })
 public abstract class EventSerializer extends AtmosphereGWTSerializer {
+
+    // public EventSerializer() {
+    // if (getMode() == SerialMode.JSON || getPushMode() == SerialMode.JSON) {
+    // jsonSerializer = GWT.create(JSONObjectSerializer.class);
+    // }
+    // }
+
+    @Override
+    public SerialMode getMode() {
+        return SerialMode.JSON;
+    }
+
+    @Override
+    public SerialMode getPushMode() {
+        return SerialMode.JSON;
+    }
 }

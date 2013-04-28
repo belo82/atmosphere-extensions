@@ -15,26 +15,29 @@
  */
 package org.atmosphere.samples.server;
 
-import org.atmosphere.gwt.server.AtmosphereGwtHandler;
-import org.atmosphere.gwt.server.GwtAtmosphereResource;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.atmosphere.cpr.Broadcaster;
 import org.atmosphere.cpr.BroadcasterFactory;
+import org.atmosphere.gwt.server.AtmosphereGwtHandler;
+import org.atmosphere.gwt.server.GwtAtmosphereResource;
+import org.atmosphere.samples.client.Event;
+import org.atmosphere.samples.server.services.ApplicationContextProvider;
+import org.atmosphere.samples.server.services.DummyService;
 
 /**
  * @author p.havelaar
  */
 public class ChatHandler extends AtmosphereGwtHandler {
+    private DummyService service = (DummyService) ApplicationContextProvider.getBean("dummyService");
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
@@ -61,8 +64,9 @@ public class ChatHandler extends AtmosphereGwtHandler {
     }
 
     @Override
-    public void doPost(HttpServletRequest postRequest, HttpServletResponse postResponse,
-            List<?> messages, GwtAtmosphereResource cometResource) {
+    public void doPost(HttpServletRequest postRequest, HttpServletResponse postResponse, List<?> messages,
+            GwtAtmosphereResource cometResource) {
+        service.logMessage((List<Event>) messages);
         broadcast(messages, cometResource);
     }
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd            
+	                       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd            
+	                       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd            
+	                       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<context:property-placeholder />
+
+	<!-- Turn on AspectJ @Configurable support 
+	<context:spring-configured />
+	-->
+
+	<!-- turned on component scanning for GUI components -->
+	<context:component-scan base-package="org.atmosphere.samples.server.services" />
+	
+	<bean id="applicationContextProvider" class="org.atmosphere.samples.server.services.ApplicationContextProvider" />
+
+	<!-- Turn on @Autowired, @PostConstruct etc support -->
+	<context:annotation-config />
+</beans>

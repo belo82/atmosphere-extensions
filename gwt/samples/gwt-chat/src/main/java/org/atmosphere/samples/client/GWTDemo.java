@@ -15,6 +15,14 @@
  */
 package org.atmosphere.samples.client;
 
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.atmosphere.gwt.client.AtmosphereClient;
+import org.atmosphere.gwt.client.AtmosphereGWTSerializer;
+import org.atmosphere.gwt.client.AtmosphereListener;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
@@ -38,14 +46,6 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import org.atmosphere.gwt.client.AtmosphereClient;
-import org.atmosphere.gwt.client.AtmosphereGWTSerializer;
-import org.atmosphere.gwt.client.AtmosphereListener;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author p.havelaar
@@ -65,20 +65,20 @@ public class GWTDemo implements EntryPoint {
     static final String COLOR_MESSAGE_OTHERS = "red";
 
     int count = 0;
-    
+
     AtmosphereClient client;
     MyCometListener cometListener = new MyCometListener();
     AtmosphereGWTSerializer serializer = GWT.create(EventSerializer.class);
     String author;
-    
+
     Label label;
     TextBox input;
     Element chat;
-    String room="room1";
-    
+    String room = "room1";
+
     @Override
     public void onModuleLoad() {
-        
+
         final ListBox roomSelect = new ListBox();
         roomSelect.addItem("Room 1", "room1");
         roomSelect.addItem("Room 2", "room2");
@@ -93,12 +93,12 @@ public class GWTDemo implements EntryPoint {
             }
         });
         RootPanel.get("room").add(roomSelect);
-        
+
         chat = Document.get().getElementById("chat");
-        
+
         label = new Label(LABEL_ENTER_ROOM);
         RootPanel.get("label").add(label);
-        
+
         input = new TextBox();
         input.addKeyDownHandler(new KeyDownHandler() {
             @Override
@@ -120,7 +120,7 @@ public class GWTDemo implements EntryPoint {
             }
         });
         RootPanel.get("send").add(send);
-        
+
         HTMLPanel logPanel = new HTMLPanel("") {
             @Override
             public void add(Widget widget) {
@@ -130,24 +130,25 @@ public class GWTDemo implements EntryPoint {
         };
         RootPanel.get("logger").add(logPanel);
         Logger.getLogger("").addHandler(new HasWidgetsLogHandler(logPanel));
-    
+
         changeRoom(room);
     }
-    
+
     void sendMessage(String message) {
         if (author == null) {
             author = message;
-            client.broadcast(new Event(author, MESSAGE_JOINED_ROOM));
+            // client.broadcast(new Event(author, MESSAGE_JOINED_ROOM));
+            client.post(new Event(author, MESSAGE_JOINED_ROOM));
             label.setText(LABEL_TYPE_MESSAGE);
         } else {
-            client.broadcast(new Event(author, message));
+            client.post(new Event(author, message));
         }
     }
-    
+
     String getUrl() {
         return GWT.getModuleBaseURL() + "gwtComet/" + room;
     }
-    
+
     void changeRoom(final String newRoom) {
         if (client != null) {
             if (author != null) {
@@ -168,20 +169,20 @@ public class GWTDemo implements EntryPoint {
             }
         });
     }
-    
+
     void clearChat() {
         chat.setInnerHTML("");
     }
-    
+
     void addChatLine(String line, String color) {
         HTML newLine = new HTML(line);
         newLine.getElement().getStyle().setColor(color);
         chat.appendChild(newLine.getElement());
         newLine.getElement().scrollIntoView();
     }
-    
+
     private class MyCometListener implements AtmosphereListener {
-        
+
         DateTimeFormat timeFormat = DateTimeFormat.getFormat(DateTimeFormat.PredefinedFormat.TIME_MEDIUM);
 
         @Override
@@ -194,7 +195,7 @@ public class GWTDemo implements EntryPoint {
         public void onBeforeDisconnected() {
             logger.log(Level.INFO, "comet.beforeDisconnected");
             if (author != null) {
-                client.broadcast(new Event(author, MESSAGE_LEFT_ROOM));
+                client.post(new Event(author, MESSAGE_LEFT_ROOM));
             }
         }
 
@@ -233,9 +234,8 @@ public class GWTDemo implements EntryPoint {
         public void onMessage(List<?> messages) {
             for (Object obj : messages) {
                 if (obj instanceof Event) {
-                    Event e = (Event)obj;
-                    String line = timeFormat.format(e.getTime())
-                            + " <b>" + e.getAuthor() + "</b> " + e.getMessage();
+                    Event e = (Event) obj;
+                    String line = timeFormat.format(e.getTime()) + " <b>" + e.getAuthor() + "</b> " + e.getMessage();
                     if (e.getAuthor().equals(author)) {
                         addChatLine(line, COLOR_MESSAGE_SELF);
                     } else {
